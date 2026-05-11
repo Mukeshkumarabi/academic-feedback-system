@@ -1,28 +1,23 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useCallback } from "react";import axios from "axios";
 
 function AdminFeedback() {
   const [feedbacks, setFeedbacks] = useState([]);
 
   const token = localStorage.getItem("token");
 
-  const fetchAllFeedback = async () => {
+  const fetchAllFeedback = useCallback(async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/feedback",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axios.get("http://localhost:5000/api/feedback", {
+         headers: {
+         Authorization: `Bearer ${token}`,
+      },
+    });
 
       setFeedbacks(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+    }   catch (error) {
+    console.log(error);
+  }
+}, [token]);
   useEffect(() => {
     fetchAllFeedback();
   }, []);

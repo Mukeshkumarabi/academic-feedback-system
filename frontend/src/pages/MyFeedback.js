@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";import axios from "axios";
+import { useEffect, useState, useCallback } from "react";
+import axios from "axios";
 
 function MyFeedback() {
   const [feedbacks, setFeedbacks] = useState([]);
@@ -8,22 +9,22 @@ function MyFeedback() {
   const token = localStorage.getItem("token");
 
   const fetchMyFeedback = useCallback(async () => {
-  try {
-    const res = await axios.get("http://localhost:5000/api/feedback/my", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const res = await axios.get("http://localhost:5000/api/feedback/my", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    setFeedbacks(res.data);
-  } catch (error) {
-    console.log(error);
-  }
-}, [token]);
+      setFeedbacks(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [token]);
 
   useEffect(() => {
     fetchMyFeedback();
-  }, []);
+  }, [fetchMyFeedback]);
 
   const updateFeedback = async (id) => {
     try {
@@ -46,71 +47,47 @@ function MyFeedback() {
     }
   };
 
- const deleteFeedback = async (id) => {
-  try {
-    await axios.delete(
-      `http://localhost:5000/api/feedback/${id}`,
-      {
+  const deleteFeedback = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/feedback/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
+      });
 
-    alert("Feedback deleted 🗑️");
-    fetchMyFeedback();
-  } catch (error) {
-    console.log("Delete error:", error);
-    alert(error.response?.data?.message || error.response?.data?.error || "Delete failed ❌");
-  }
-};
+      alert("Feedback deleted 🗑️");
+      fetchMyFeedback();
+    } catch (error) {
+      alert(error.response?.data?.message || "Delete failed ❌");
+    }
+  };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
+    <div className="panel">
       <h2>My Feedback</h2>
 
       {feedbacks.map((item) => (
-        <div
-          key={item._id}
-          style={{
-            border: "1px solid #ccc",
-            padding: "15px",
-            margin: "10px auto",
-            width: "420px",
-            borderRadius: "10px",
-          }}
-        >
-          <p>
-            <strong>Message:</strong> {item.message}
-          </p>
-
-          <p>
-            <strong>Created:</strong>{" "}
-            {new Date(item.createdAt).toLocaleString()}
-          </p>
+        <div key={item._id} className="card">
+          <p><strong>Item:</strong> {item.item}</p>
+          <p><strong>Rating:</strong> ⭐ {item.rating}</p>
+          <p><strong>Message:</strong> {item.message}</p>
+          <p><strong>Created:</strong> {new Date(item.createdAt).toLocaleString()}</p>
 
           {editId === item._id ? (
             <>
               <input
+                className="input"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
               />
-              <br /><br />
-
-              <button onClick={() => updateFeedback(item._id)}>
+              <button className="save-btn" onClick={() => updateFeedback(item._id)}>
                 Save
-              </button>
-
-              <button
-                onClick={() => setEditId(null)}
-                style={{ marginLeft: "10px" }}
-              >
-                Cancel
               </button>
             </>
           ) : (
-            <>
+            <div className="card-buttons">
               <button
+                className="edit-btn"
                 onClick={() => {
                   setEditId(item._id);
                   setNewMessage(item.message);
@@ -119,17 +96,10 @@ function MyFeedback() {
                 Edit
               </button>
 
-              <button
-                onClick={() => deleteFeedback(item._id)}
-                style={{
-                  marginLeft: "10px",
-                  backgroundColor: "red",
-                  color: "white",
-                }}
-              >
+              <button className="delete-btn" onClick={() => deleteFeedback(item._id)}>
                 Delete
               </button>
-            </>
+            </div>
           )}
         </div>
       ))}
